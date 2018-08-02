@@ -28,9 +28,9 @@ app.get('/viewMap', function(req, res){
 })
 
 //find Tree in MongoDB using known latitude and longitude
-//ex. fetch get request to "/viewTree/id=123456"
+//ex. fetch get request to "/viewTree/treeId=123456"
 app.get('/viewTree', function(req, res){
-  Tree.findById(req.query.id, function(err, tree){
+  Tree.findById(req.query.treeId, function(err, tree){
     if(err){
       console.log(err);
       res.send(err);
@@ -42,9 +42,9 @@ app.get('/viewTree', function(req, res){
 });
 
 //returns user's items from MongoDB
-//ex. fetch get request to "/viewTree/addItems?id=12345"
+//ex. fetch get request to "/viewTree/addItems?userId=12345"
 app.get('/viewTree/addItems', function(req, res){
-  User.findById(req.query.id, function(err, user){
+  User.findById(req.query.userId, function(err, user){
     if(err){
       console.log(err);
       res.send(err);
@@ -56,7 +56,7 @@ app.get('/viewTree/addItems', function(req, res){
 });
 
 app.get('/viewTree/takeItems', function(req, res){
-  Tree.findById(req.query.id, function(err, tree){
+  Tree.findById(req.query.treeId, function(err, tree){
     if(err){
       console.log(err);
       res.send(err);
@@ -186,6 +186,17 @@ app.post('/viewTree/takeItem', function(req, res){
   })
 });
 
+app.get('/addTree', function(req, res){
+  User.findById(req.query.userId, function(err, user){
+    if(err){
+      console.log(err);
+    } else {
+      console.log(user.items);
+      res.json(user.items);
+    }
+  })
+})
+
 app.post('/addTree', function(req, res){
   var tree = new Tree({
     latitude: req.query.latitude,
@@ -196,7 +207,7 @@ app.post('/addTree', function(req, res){
     if(err){
       console.log(err);
     } else {
-      res.redirect('/viewTree?id=' + tree._id);
+      res.redirect('/viewMap');
     }
   })
 })

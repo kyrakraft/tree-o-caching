@@ -4,6 +4,9 @@ import Home from './components/Home'
 import Map from './components/Map'
 import { createStackNavigator } from 'react-navigation';
 import AddTree from './components/AddTree'
+import TreeProfile from './components/TreeProfile'
+import TakeItem from './components/TakeItem'
+import ViewOwnItems from './components/ViewOwnItems'
 
 // class App extends React.Component {
 //   render() {
@@ -28,6 +31,15 @@ export default App = createStackNavigator(
     },
     AddTree: {
       screen: AddTree
+    },
+    TreeProfile: {
+      screen: TreeProfile
+    },
+    TakeItem: {
+      screen: TakeItem
+    },
+    ViewOwnItems: {
+      screen: ViewOwnItems
     }
   }, {initialRouteName: 'Home'}
 )

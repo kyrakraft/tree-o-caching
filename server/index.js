@@ -16,12 +16,23 @@ mongoose.connect(process.env.MONGODB_URI);
 app.use(bodyParser.urlencoded({ extended: false })); // Parses urlencoded bodies
 app.use(bodyParser.json()); // Send JSON responses
 
+app.get('/getItem', function(req, res){
+  Item.findById(req.query.itemId, function(err, item){
+    if(err){
+      console.log(err);
+    } else {
+      console.log(item);
+      res.json(item);
+    }
+  })
+})
+
 app.get('/viewMap', function(req, res){
   Tree.find({}, function(err, trees){
     if (err){
       console.log(err);
     } else {
-      console.log(trees);
+      console.log("hello", trees);
       res.json(trees);
     }
   })
@@ -130,50 +141,54 @@ app.post('/viewTree/addItem', function(req, res){
 });
 
 app.post('/viewTree/takeItem', function(req, res){
-  Tree.findById(req.query.treeId, function(err, tree){
-    if(err){
-      console.log(err);
-    } else {
-      var newItems = tree.items;
-      var foundIndex = newItems.findIndex((itemId) => {
-        return itemId == req.query.itemId
-      });
-      console.log(foundIndex);
-      delete newItems[foundIndex];
-      Tree.findByIdAndUpdate(req.query.treeId, {
-        items: newItems,
-      }, function(err, tree){
+  // Tree.findById(req.body.treeId, function(err, tree){
+  //   if(err){
+  //     console.log(err);
+  //   } else {
+  //     // var newItems = tree.items;
+  //     // var foundIndex = newItems.findIndex((itemId) => {
+  //     //   return itemId == req.body.itemId
+  //     // });
+  //     // console.log(foundIndex);
+  //     // delete newItems[foundIndex];
+  //     //console.log("NEWWWWWWITEMMSMSMSMSMSMSMSMS", newItems)
+      Tree.findByIdAndUpdate(req.body.treeId, {
+        items: [null],
+      },{
+        new: true,
+      }, function(err, tree2){
         if(err){
           console.log(err);
         } else {
-          console.log(tree);
-          Item.findByIdAndUpdate(req.query.itemId, {
+          console.log("TREEEEEEEETWOOOOOOO", tree2);
+          Item.findByIdAndUpdate(req.body.itemId, {
             tree: null,
-            user: req.query.userId,
+            user: req.body.userId,
           }, function(err, item){
             if(err){
               console.log(err);
             } else {
-              console.log(item);
-              User.findById(req.query.userId, function(err, user){
+              console.log("ITEMMMMMMM", item);
+              User.findById(req.body.userId, function(err, user){
                 if(err){
                   console.log(err);
                 } else {
-                  console.log(user);
+                  console.log("USERRRRR", user);
                   var newItems = user.items;
                   for (var i = 0; i < newItems.length; i++){
                     if (newItems[i] == null){
                       delete newItems[i];
                     }
                   }
-                  newItems.push(req.query.itemId);
-                  User.findByIdAndUpdate(req.query.userId, {
+                  newItems.push(req.body.itemId);
+                  User.findByIdAndUpdate(req.body.userId, {
                     items: newItems
                   }, function(err, user){
                     if(err){
                       console.log(err);
                     } else {
-                      res.redirect('/viewTree?=id' + req.query.treeId);
+                      res.json(tree2)
+                      //res.redirect('/viewTree?=id' + req.query.treeId);
                     }
                   })
                 }
@@ -182,8 +197,8 @@ app.post('/viewTree/takeItem', function(req, res){
           })
         }
       })
-    }
-  })
+    //}
+  //})
 });
 
 app.get('/addTree', function(req, res){
@@ -192,16 +207,29 @@ app.get('/addTree', function(req, res){
       console.log(err);
     } else {
       console.log(user.items);
-      res.json(user.items);
+      var itemIds = user.items;
+      var returnItems = [];
+      itemIds.map((itemId) => {
+        if(itemId !== null){
+          Item.findById(itemId, function(err, item){
+            if(err){
+              console.log(err);
+            } else {
+              returnItems.push(item);
+              res.json(returnItems);
+            }
+          })
+        }
+      })
     }
   })
 })
 
 app.post('/addTree', function(req, res){
   var tree = new Tree({
-    latitude: req.query.latitude,
-    longitude: req.query.longitude,
-    items: req.query.item, //item id
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    items: req.body.item, //item id
   });
   tree.save(function(err){
     if(err){

@@ -8,48 +8,87 @@ import {
 import { createStackNavigator } from 'react-navigation';
 import Map from './Map'
 
-class HomeScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Home'
+export default class HomeScreen extends React.Component {
+  // static navigationOptions = {
+  //   title: 'Home'
+  // }
+  constructor(){
+    super()
+    this.state = {
+      trees: [],
+      userId: '5b62420ef81f8651bed5c659'
+    }
   }
 
   mapPress() {
-    this.props.navigation.navigate('Map')
+
+    fetch('http://4afb1aa4.ngrok.io/viewmap', {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+
+    })
+    .then((response) =>
+    {
+    console.log(response)
+    return response.json()
+  })
+    .then((responseJson) => {
+      //console.log(responseJson)
+      this.setState({
+        trees: responseJson
+      })
+    })
+    .then(() => {this.props.navigation.navigate('Map', {trees: this.state.trees, userId: this.state.userId})})
+    .catch((err) => {
+      alert("error: ", err)
+      });
+
+
+
   }
 
   render() {
     return(
       <View style={styles.container}>
-        <View style={{flex: 1, width: 300, height: 20}}>
-          <Text style={{ color: '#28593b', fontSize: 25}}>
-            welcome to tree-o-caching!
+
+        <View style={{flex: 5, width: 300, height: 100, justifyContent: 'center', alignItems: 'center', marginTop: 40, marginBottom: 90,
+          backgroundColor: '#d9e4fc', borderColor: 'white', borderRadius: 20, borderWidth: 7}}>
+          <Text style={{ color: '#28593b', fontSize: 20, marginBottom: 19}}>
+            welcome to
+          </Text>
+          <Text style={{ color: '#28593b', fontSize: 45, fontFamily: 'ArialRoundedMTBold'}}>
+            TREE-O-CACHING!
           </Text>
          </View>
-        <View style={{flex: 1, justifyContent: 'center', alignItems:'center', width: 60, height: 55}}>
-        <TouchableOpacity onPress={ () => {this.mapPress()} } style={{flex: 1, height: 55, width: 70,
-          backgroundColor: '#28593b', marginTop: 7, marginBottom: 210,
-          borderColor: '#28593b', borderWidth: 1, borderRadius: 16, justifyContent: 'center', alignItems: 'center',
-        paddingTop: 6, paddingBottom: 10, paddingLeft: 6, paddingRight: 8
-      }}>
-          <Text style={{flex: 1, fontSize: 25, color: '#ddf1ff'}}> map </Text>
+
+        <View style={{flex: 1, justifyContent: 'center', alignItems:'center', width: 100, height: 45,
+          backgroundColor: '#28593b', marginTop: 7, marginBottom: 170, borderColor: 'white',
+        borderWidth: 3, borderRadius: 26, justifyContent: 'center', alignItems: 'center',
+      paddingTop: 6, paddingBottom: 6, paddingLeft: 6, paddingRight: 6}}>
+        <TouchableOpacity onPress={ () => {this.mapPress()} } style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text style={{flex: 1, fontSize: 35, color: '#ddf1ff'}}> map </Text>
         </TouchableOpacity>
         </View>
+
+        {/* <Map latitude={this.state.latitude} longitude={this.state.longitude}/> */}
       </View>
     )
   }
 }
 
-const Home = createStackNavigator(
-  {
-    Home: {
-     screen: HomeScreen
-   },
-   Map: {
-     screen: Map
-   }
- }, {initialRouteName: 'Home'})
-
- export default Home;
+// const Home = createStackNavigator(
+//   {
+//     Home: {
+//      screen: HomeScreen
+//    },
+//    Map: {
+//      screen: Map
+//    }
+//  }, {initialRouteName: 'Home'})
+//
+//  export default Home;
 
 const styles = StyleSheet.create({
   container: {
